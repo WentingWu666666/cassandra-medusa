@@ -192,6 +192,11 @@ def main(config, backup_name_arg, stagger_time, enable_md5_checks_flag, mode):
 
         if differential_mode is True:
             node_backup.differential = mode
+
+        import datetime
+        import math
+        node_backup._started = math.floor(datetime.datetime.now().timestamp())
+
         add_backup_start_to_index(storage, node_backup)
 
         # if stagger_time:

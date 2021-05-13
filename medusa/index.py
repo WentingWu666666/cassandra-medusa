@@ -91,10 +91,6 @@ def add_backup_start_to_index(storage, node_backup):
     #     storage.prefix_path, node_backup.name, node_backup.fqdn)
     # storage.storage_driver.upload_blob_from_string(dst, node_backup.schema)
 
-    import datetime
-    import math
-    node_backup._started = math.floor(datetime.datetime.now().timestamp())
-
     dst = '{}index/backup_index/{}/started_{}_{}.timestamp'.format(
         storage.prefix_path, node_backup.name, node_backup.fqdn, node_backup.started
     )
