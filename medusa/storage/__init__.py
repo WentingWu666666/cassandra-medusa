@@ -162,15 +162,18 @@ class Storage(object):
         Use discover_node_backups to discover backups from the data folders.
         """
 
-        def is_tokenmap_file(blob):
-            return "tokenmap" in blob.name
+        # def is_tokenmap_file(blob):
+        #     return "tokenmap" in blob.name
+
+        def is_manifest_file(blob):
+            return "manifest" in blob.name
 
         def get_blob_name(blob):
             return blob.name
 
         def get_all_backup_blob_names(blobs):
             # if the tokenmap file exists, we assume the whole backup exists too
-            all_backup_blobs = filter(is_tokenmap_file, blobs)
+            all_backup_blobs = filter(is_manifest_file, blobs)
             return list(map(get_blob_name, all_backup_blobs))
 
         def get_blobs_for_fqdn(blobs, fqdn):
@@ -207,10 +210,11 @@ class Storage(object):
             manifest_blob, schema_blob, tokenmap_blob = None, None, None
             started_blob, finished_blob = None, None
             started_timestamp, finished_timestamp = None, None
+            print(tokenmap_fqdn)
             if tokenmap_fqdn in blobs_by_backup[backup_name]:
                 manifest_blob = self.lookup_blob(blobs_by_backup, backup_name, tokenmap_fqdn, 'manifest')
-                schema_blob = self.lookup_blob(blobs_by_backup, backup_name, tokenmap_fqdn, 'schema')
-                tokenmap_blob = self.lookup_blob(blobs_by_backup, backup_name, tokenmap_fqdn, 'tokenmap')
+                # schema_blob = self.lookup_blob(blobs_by_backup, backup_name, tokenmap_fqdn, 'schema')
+                # tokenmap_blob = self.lookup_blob(blobs_by_backup, backup_name, tokenmap_fqdn, 'tokenmap')
                 started_blob = self.lookup_blob(blobs_by_backup, backup_name, tokenmap_fqdn, 'started')
                 finished_blob = self.lookup_blob(blobs_by_backup, backup_name, tokenmap_fqdn, 'finished')
                 differential_blob = self.lookup_blob(blobs_by_backup, backup_name, tokenmap_fqdn, 'differential')

@@ -227,7 +227,7 @@ class NodeBackup(object):
         return self._node_backup_path
 
     def exists(self):
-        return self._blob(self.schema_path) is not None
+        return self._blob(self.manifest_path) is not None
 
     def size(self):
         return sum(
