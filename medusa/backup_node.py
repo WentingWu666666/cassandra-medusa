@@ -184,25 +184,26 @@ def main(config, backup_name_arg, stagger_time, enable_md5_checks_flag, mode):
         except Exception:
             logging.warning("Throttling backup impossible. It's probable that ionice is not available.")
 
-        logging.info('Saving tokenmap and schema')
-        schema, tokenmap = get_schema_and_tokenmap(cassandra)
+        # logging.info('Saving tokenmap and schema')
+        # schema, tokenmap = get_schema_and_tokenmap(cassandra)
+        #
+        # node_backup.schema = schema
+        # node_backup.tokenmap = json.dumps(tokenmap)
 
-        node_backup.schema = schema
-        node_backup.tokenmap = json.dumps(tokenmap)
         if differential_mode is True:
             node_backup.differential = mode
         add_backup_start_to_index(storage, node_backup)
 
-        if stagger_time:
-            stagger_end = start + stagger_time
-            logging.info('Staggering backup run, trying until {}'.format(stagger_end))
-            while not stagger(config.storage.fqdn, storage, tokenmap):
-                if datetime.datetime.now() < stagger_end:
-                    logging.info('Staggering this backup run...')
-                    time.sleep(60)
-                else:
-                    raise IOError('Backups on previous nodes did not complete'
-                                  ' within our stagger time.')
+        # if stagger_time:
+        #     stagger_end = start + stagger_time
+        #     logging.info('Staggering backup run, trying until {}'.format(stagger_end))
+        #     while not stagger(config.storage.fqdn, storage, tokenmap):
+        #         if datetime.datetime.now() < stagger_end:
+        #             logging.info('Staggering this backup run...')
+        #             time.sleep(60)
+        #         else:
+        #             raise IOError('Backups on previous nodes did not complete'
+        #                           ' within our stagger time.')
 
         actual_start = datetime.datetime.now()
 

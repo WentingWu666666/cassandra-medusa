@@ -84,12 +84,17 @@ def build_indices(config, noop):
 
 
 def add_backup_start_to_index(storage, node_backup):
-    dst = '{}index/backup_index/{}/tokenmap_{}.json'.format(
-        storage.prefix_path, node_backup.name, node_backup.fqdn)
-    storage.storage_driver.upload_blob_from_string(dst, node_backup.tokenmap)
-    dst = '{}index/backup_index/{}/schema_{}.cql'.format(
-        storage.prefix_path, node_backup.name, node_backup.fqdn)
-    storage.storage_driver.upload_blob_from_string(dst, node_backup.schema)
+    # dst = '{}index/backup_index/{}/tokenmap_{}.json'.format(
+    #     storage.prefix_path, node_backup.name, node_backup.fqdn)
+    # storage.storage_driver.upload_blob_from_string(dst, node_backup.tokenmap)
+    # dst = '{}index/backup_index/{}/schema_{}.cql'.format(
+    #     storage.prefix_path, node_backup.name, node_backup.fqdn)
+    # storage.storage_driver.upload_blob_from_string(dst, node_backup.schema)
+
+    import datetime
+    import math
+    node_backup._started = math.floor(datetime.datetime.now().timestamp())
+
     dst = '{}index/backup_index/{}/started_{}_{}.timestamp'.format(
         storage.prefix_path, node_backup.name, node_backup.fqdn, node_backup.started
     )
@@ -111,8 +116,8 @@ def add_backup_finish_to_index(storage, node_backup):
 
 
 def set_latest_backup_in_index(storage, node_backup):
-    dst = '{}index/latest_backup/{}/tokenmap.json'.format(storage.prefix_path, node_backup.fqdn)
-    storage.storage_driver.upload_blob_from_string(dst, node_backup.tokenmap)
+    # dst = '{}index/latest_backup/{}/tokenmap.json'.format(storage.prefix_path, node_backup.fqdn)
+    # storage.storage_driver.upload_blob_from_string(dst, node_backup.tokenmap)
     dst = '{}index/latest_backup/{}/backup_name.txt'.format(storage.prefix_path, node_backup.fqdn)
     storage.storage_driver.upload_blob_from_string(dst, node_backup.name)
 
