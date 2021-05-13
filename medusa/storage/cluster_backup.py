@@ -40,8 +40,8 @@ class ClusterBackup(object):
 
     @property
     def finished(self):
-        if any(self.missing_nodes()):
-            return None
+        # if any(self.missing_nodes()):
+        #     return None
 
         finished_timestamps = list(map(operator.attrgetter('finished'), self.node_backups.values()))
         if all(finished_timestamps):
