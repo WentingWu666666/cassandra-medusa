@@ -119,17 +119,17 @@ def restore_node_locally(config, temp_dir, backup_name, in_place, keep_auth, see
     # In a Kubernetes deployment we can assume that seed nodes will be started first. It will
     # handled either by the statefulset controller or by the controller of a Cassandra
     # operator.
-    # if not medusa.utils.evaluate_boolean(config.kubernetes.enabled):
-    #     if seeds is not None:
-    #         wait_for_seeds(config, seeds)
-    #     else:
-    #         logging.info('No --seeds specified so we will not wait for any')
-    #
-    #     # Start up Cassandra
-    #     logging.info('Starting Cassandra')
-    #     # restoring in place retains system.local, which has tokens in it. no need to specify extra
-    #     if in_place:
-    #         cassandra.start_with_implicit_token()
+    if not medusa.utils.evaluate_boolean(config.kubernetes.enabled):
+        if seeds is not None:
+            wait_for_seeds(config, seeds)
+        else:
+            logging.info('No --seeds specified so we will not wait for any')
+
+        # Start up Cassandra
+        logging.info('Starting Cassandra')
+        # restoring in place retains system.local, which has tokens in it. no need to specify extra
+        if in_place:
+            cassandra.start_with_implicit_token()
     #     else:
     #         cassandra.start(tokens)
     # elif not in_place:
