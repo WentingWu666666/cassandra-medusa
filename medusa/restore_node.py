@@ -108,33 +108,33 @@ def restore_node_locally(config, temp_dir, backup_name, in_place, keep_auth, see
             continue
         maybe_restore_section(section, download_dir, cassandra.root, in_place, keep_auth, use_sudo)
 
-    node_fqdn = storage.config.fqdn
-    token_map_file = download_dir / 'tokenmap.json'
-    with open(str(token_map_file), 'r') as f:
-        tokens = get_node_tokens(node_fqdn, f)
-        logging.debug("Parsed tokens: {}".format(tokens))
+    # node_fqdn = storage.config.fqdn
+    # token_map_file = download_dir / 'tokenmap.json'
+    # with open(str(token_map_file), 'r') as f:
+    #     tokens = get_node_tokens(node_fqdn, f)
+    #     logging.debug("Parsed tokens: {}".format(tokens))
 
     # possibly wait for seeds
     #
     # In a Kubernetes deployment we can assume that seed nodes will be started first. It will
     # handled either by the statefulset controller or by the controller of a Cassandra
     # operator.
-    if not medusa.utils.evaluate_boolean(config.kubernetes.enabled):
-        if seeds is not None:
-            wait_for_seeds(config, seeds)
-        else:
-            logging.info('No --seeds specified so we will not wait for any')
-
-        # Start up Cassandra
-        logging.info('Starting Cassandra')
-        # restoring in place retains system.local, which has tokens in it. no need to specify extra
-        if in_place:
-            cassandra.start_with_implicit_token()
-        else:
-            cassandra.start(tokens)
-    elif not in_place:
-        # Kubernetes will manage the lifecycle, but we still need to modify the tokens
-        cassandra.replaceTokensInCassandraYamlAndDisableBootstrap(tokens)
+    # if not medusa.utils.evaluate_boolean(config.kubernetes.enabled):
+    #     if seeds is not None:
+    #         wait_for_seeds(config, seeds)
+    #     else:
+    #         logging.info('No --seeds specified so we will not wait for any')
+    #
+    #     # Start up Cassandra
+    #     logging.info('Starting Cassandra')
+    #     # restoring in place retains system.local, which has tokens in it. no need to specify extra
+    #     if in_place:
+    #         cassandra.start_with_implicit_token()
+    #     else:
+    #         cassandra.start(tokens)
+    # elif not in_place:
+    #     # Kubernetes will manage the lifecycle, but we still need to modify the tokens
+    #     cassandra.replaceTokensInCassandraYamlAndDisableBootstrap(tokens)
 
     # Clean the restored data from local temporary folder
     clean_path(download_dir, use_sudo, keep_folder=False)
