@@ -25,6 +25,7 @@ from retrying import retry
 
 import medusa
 from medusa.storage.azure_blobs_storage.azcli import AzCli
+from medusa.storage.azure_blobs_storage.azuresdk import AzureBlobService
 
 MAX_UP_DOWN_LOAD_RETRIES = 5
 
@@ -110,15 +111,19 @@ def __upload_file(storage, connection, src, dest, bucket, multi_part_upload_thre
     )
     full_object_name = str("{}/{}".format(dest, obj_name))
 
-    # if file is empty, uploading with libcloud azure storage driver (_upload_single_part) will fail with 403 error
-    # thus, we need to use az cli command (_upload_multi_part) to upload empty files
-    if file_size == 0 or file_size >= multi_part_upload_threshold:
-        # Files larger than the configured threshold should be uploaded as multi part
-        logging.debug("Uploading {} as multi part".format(full_object_name))
-        obj = _upload_multi_part(storage, connection, src, bucket, full_object_name)
+    if storage.config.azure_driver == "azure-storage-blob":
+        logging.debug("Uploading {}".format(full_object_name))
+        obj = AzureBlobService(storage).upload_blob(bucket_name=bucket, src=src, dest=full_object_name)
     else:
-        logging.debug("Uploading {} as single part".format(full_object_name))
-        obj = _upload_single_part(storage, connection, src, bucket, full_object_name)
+        # if file is empty, uploading with libcloud azure storage driver (_upload_single_part) will fail with 403 error
+        # thus, we need to use az cli command (_upload_multi_part) to upload empty files
+        if file_size == 0 or file_size >= multi_part_upload_threshold:
+            # Files larger than the configured threshold should be uploaded as multi part
+            logging.debug("Uploading {} as multi part".format(full_object_name))
+            obj = _upload_multi_part(storage, connection, src, bucket, full_object_name)
+        else:
+            logging.debug("Uploading {} as single part".format(full_object_name))
+            obj = _upload_single_part(storage, connection, src, bucket, full_object_name)
 
     return medusa.storage.ManifestObject(obj.name, int(obj.size), obj.extra['md5_hash'])
 
@@ -185,13 +190,17 @@ def __download_blob(storage, connection, src, dest, bucket, multi_part_upload_th
             else dest
         )
 
-        if int(blob.size) >= multi_part_upload_threshold:
-            # Files larger than the configured threshold should be uploaded as multi part
-            logging.debug("Downloading {} as multi part".format(blob_dest))
-            _download_multi_part(storage, connection, src_path, bucket, blob_dest)
+        if storage.config.azure_driver == "azure-storage-blob":
+            logging.debug("Downloading {}".format(blob_dest))
+            AzureBlobService(storage).download_blob(bucket_name=bucket, src=src_path, dest=blob_dest)
         else:
-            logging.debug("Downloading {} as single part".format(blob_dest))
-            _download_single_part(connection, blob, blob_dest)
+            if int(blob.size) >= multi_part_upload_threshold:
+                # Files larger than the configured threshold should be uploaded as multi part
+                logging.debug("Downloading {} as multi part".format(blob_dest))
+                _download_multi_part(storage, connection, src_path, bucket, blob_dest)
+            else:
+                logging.debug("Downloading {} as single part".format(blob_dest))
+                _download_single_part(connection, blob, blob_dest)
 
     except ObjectDoesNotExistError:
         return None

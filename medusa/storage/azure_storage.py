@@ -39,15 +39,16 @@ class AzureStorage(AbstractStorage):
         return driver
 
     def check_dependencies(self):
-        az_cli_cmd = AzCli.cmd()
-        try:
-            subprocess.check_call(az_cli_cmd + ["help"], stdout=PIPE, stderr=PIPE)
-        except Exception:
-            raise RuntimeError(
-                "Azure cli doesn't seem to be installed on this system and is a "
-                + "required dependency for the Azure backend. "
-                + "Please check https://docs.microsoft.com/en-us/cli/azure/install-azure-cli for guidelines."
-            )
+        if self.config.azure_driver == "azure-cli":
+            az_cli_cmd = AzCli.cmd()
+            try:
+                subprocess.check_call(az_cli_cmd + ["help"], stdout=PIPE, stderr=PIPE)
+            except Exception:
+                raise RuntimeError(
+                    "Azure cli doesn't seem to be installed on this system and is a "
+                    + "required dependency for the Azure backend. "
+                    + "Please check https://docs.microsoft.com/en-us/cli/azure/install-azure-cli for guidelines."
+                )
 
     def get_object_datetime(self, blob):
         logging.debug(

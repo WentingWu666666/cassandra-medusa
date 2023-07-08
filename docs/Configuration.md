@@ -109,6 +109,8 @@ backup_grace_period_in_days = 10
 
 ;aws_cli_path = <Location of the aws cli binary if not in PATH>
 
+;azure_driver = <Azure driver to use. Either "azure-cli" or "azure-storage-blob". Defaults to "azure-cli">
+
 [monitoring]
 ;monitoring_provider = <Provider used for sending metrics. Currently either of "ffwd" or "local">
 
